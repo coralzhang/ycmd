@@ -22,6 +22,7 @@ env:
     - MONO_MANAGED_WATCHER=disabled
     # Travis can run out of RAM, so we need to be careful here.
     - YCM_CORES=3
+    - PHP_VERSION=5.6.16
     - COVERAGE=true
   matrix:
     # Since 3.0.4, Flake8 is not working anymore on Python 2.6.
@@ -61,6 +62,9 @@ addons:
      - llvm
      - libncurses5-dev
      - libncursesw5-dev
+     # Packages needed for building PHP
+     - libmcrypt-dev
+     - libtidy-dev
 cache:
   directories:
     - $HOME/.cache/pip  # Python packages from pip
@@ -70,3 +74,5 @@ cache:
     - $HOME/.pyenv  # pyenv
     - $TRAVIS_BUILD_DIR/clang_archives  # Clang downloads
     - $TRAVIS_BUILD_DIR/third_party/racerd/target  # Racerd compilation
+    - $HOME/.composer/cache  # Composer
+    - $HOME/.phpenv/versions/$PHP_VERSION  # PHP env

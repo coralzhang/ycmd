@@ -258,6 +258,8 @@ def ParseArguments():
                        help = 'Build Go semantic completion engine.' )
   parser.add_argument( '--racer-completer', action = 'store_true',
                        help = 'Build rust semantic completion engine.' )
+  parser.add_argument( '--php-completer', action = 'store_true',
+                       help = 'Configure PHP semantic completion engine.' )
   parser.add_argument( '--system-boost', action = 'store_true',
                        help = 'Use the system boost instead of bundled one. '
                        'NOT RECOMMENDED OR SUPPORTED!')
@@ -460,6 +462,31 @@ def WritePythonUsedDuringBuild():
     f.write( sys.executable )
 
 
+def ConfigurePHPCompleter():
+  php_executable = FindExecutable( 'php' )
+  if not php_executable:
+    sys.exit( 'php is required to configure PHP completer' )
+
+  # Download Composer.
+  os.chdir( p.join( DIR_OF_THIRD_PARTY, 'padawan.php' ) )
+  downloader = subprocess.Popen(
+    [ php_executable, '-r', "readfile('https://getcomposer.org/installer');" ],
+    stdout = subprocess.PIPE )
+  executor = subprocess.Popen( [ php_executable ],
+                               stdin = downloader.stdout,
+                               stdout = subprocess.PIPE )
+  downloader.stdout.close()
+  executor.communicate()[ 0 ]
+
+  # Install dependencies.
+  subprocess.check_call( [ php_executable, 'composer.phar', 'install',
+                           '--no-interaction' ] )
+
+  # Clean up.
+  os.remove( os.path.join( DIR_OF_THIRD_PARTY, 'padawan.php',
+                           'composer.phar' ) )
+
+
 def Main():
   CheckDeps()
   args = ParseArguments()
@@ -473,8 +500,9 @@ def Main():
     SetUpTern()
   if args.racer_completer or args.all_completers:
     BuildRacerd()
+  if args.php_completer:
+    ConfigurePHPCompleter()
   WritePythonUsedDuringBuild()
-
 
 if __name__ == '__main__':
   Main()

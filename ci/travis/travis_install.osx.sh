@@ -5,17 +5,18 @@
 brew update || brew update
 
 # List of homebrew formulae to install in the order they appear.
-# We require node, go and ninja for our build and tests, and all the others are
-# dependencies of pyenv.
+# We require node, go, php and ninja for our build and tests, and all the others
+# are dependencies of pyenv.
 REQUIREMENTS="node.js
               go
               ninja
               readline
               autoconf
               pkg-config
-              openssl"
+              openssl
+              homebrew/php/php56"
 
-# Install node, go, ninja, pyenv and dependencies.
+# Install node, go, php, ninja, pyenv and dependencies.
 for pkg in $REQUIREMENTS; do
   # Install package, or upgrade it if it is already installed.
   brew install $pkg || brew outdated $pkg || brew upgrade $pkg

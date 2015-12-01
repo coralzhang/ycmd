@@ -69,6 +69,16 @@ COMPLETERS = {
     'test': [ '--exclude-dir=ycmd/tests/go' ],
     'aliases': [ 'gocode' ]
   },
+  'python': {
+    'build': [],
+    'test': [ '--exclude-dir=ycmd/tests/python' ],
+    'aliases': [ 'jedi', 'jedihttp', ]
+  },
+  'php': {
+    'build': [ '--php-completer' ],
+    'test': [ '--exclude-dir=ycmd/tests/php' ],
+    'aliases': [ 'php' ]
+  },
   'rust': {
     'build': [ '--racer-completer' ],
     'test': [ '--exclude-dir=ycmd/tests/rust' ],
@@ -78,12 +88,7 @@ COMPLETERS = {
     'build': [],
     'test': [ '--exclude-dir=ycmd/tests/typescript' ],
     'aliases': []
-  },
-  'python': {
-    'build': [],
-    'test': [ '--exclude-dir=ycmd/tests/python' ],
-    'aliases': [ 'jedi', 'jedihttp', ]
-  },
+  }
 }
 
 

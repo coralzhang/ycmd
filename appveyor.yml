@@ -24,6 +24,8 @@ environment:
   - msvc: 14
     arch: 64
     python: 35
+  composer_oauth_token:
+    secure: DP+AUPB8klnOvspSYhUZMl1ljGxLSyMrYp8FH9B85d+qqy2EPypyN37VtXqTww6A
 install:
   - ci\appveyor\appveyor_install.bat
 build_script:
@@ -38,3 +40,4 @@ cache:
   - '%USERPROFILE%\.cargo'  # Cargo package deps
   - '%APPVEYOR_BUILD_FOLDER%\clang_archives'  # Clang downloads
   - '%APPVEYOR_BUILD_FOLDER%\third_party\racerd\target'  # Racerd compilation
+  - '%LOCALAPPDATA%\Composer'  # Composer

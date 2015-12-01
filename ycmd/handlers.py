@@ -151,7 +151,8 @@ def GetReady():
     filetype = request.query.subserver
     return _JsonResponse( _IsSubserverReady( filetype ) )
   if request.query.include_subservers:
-    return _JsonResponse( _IsSubserverReady( 'cs' ) )
+    return _JsonResponse( all( _IsSubserverReady( filetype )
+                          for filetype in [ 'cs', 'python', 'php' ] ) )
   return _JsonResponse( True )
 
 
@@ -231,6 +232,13 @@ def Shutdown():
   ServerShutdown()
 
   return _JsonResponse( True )
+
+
+@app.post( '/progress' )
+def Progress():
+  _logger.info( 'Received progress request' )
+  php_completer = _server_state.GetFiletypeCompleter( [ 'php' ] )
+  return _JsonResponse( php_completer.GetProgress() )
 
 
 # The type of the param is Bottle.HTTPError

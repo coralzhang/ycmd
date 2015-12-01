@@ -98,6 +98,13 @@ def BuildDetailedInfoResponse( text ):
   }
 
 
+def BuildProgressResponse():
+  """ Returns a response object for progress request. """
+  return {
+    'progress': True
+  }
+
+
 def BuildCompletionData( insertion_text,
                          extra_menu_info = None,
                          detailed_info = None,
