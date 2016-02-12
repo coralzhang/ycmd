@@ -30,5 +30,4 @@ from ycmd.completers.cpp.clang_completer import ClangCompleter
 def GetCompleter( user_options ):
   if ycm_core.HasClangSupport():
     return ClangCompleter( user_options )
-  else:
-    return None
+  return None

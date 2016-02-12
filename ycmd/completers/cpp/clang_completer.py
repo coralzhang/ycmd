@@ -40,7 +40,7 @@ from ycmd.responses import NoExtraConfDetected, UnknownExtraConf
 
 import xml.etree.ElementTree
 
-CLANG_FILETYPES = set( [ 'c', 'cpp', 'objc', 'objcpp' ] )
+CLANG_FILETYPES = set( [ 'c', 'cpp', 'objc', 'objcpp', 'cuda' ] )
 PARSING_FILE_MESSAGE = 'Still parsing file, no completions yet.'
 NO_COMPILE_FLAGS_MESSAGE = 'Still no compile flags, no completions yet.'
 INVALID_FILE_MESSAGE = 'File is invalid.'
