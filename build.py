@@ -203,6 +203,9 @@ def CustomPythonCmakeArgs():
 
 
 def GetGenerator( args ):
+  if PathToFirstExistingExecutable( ['ninja'] ):
+    return 'Ninja'
+
   if OnWindows():
     if args.msvc == 14:
       generator = 'Visual Studio 14'
@@ -211,13 +214,10 @@ def GetGenerator( args ):
     else:
       generator = 'Visual Studio 11'
 
-    if ( not args.arch and platform.architecture()[ 0 ] == '64bit'
-         or args.arch == 64 ):
+    if args.arch == 64:
       generator = generator + ' Win64'
     return generator
 
-  if PathToFirstExistingExecutable( ['ninja'] ):
-    return 'Ninja'
   return 'Unix Makefiles'
 
 
@@ -252,6 +252,12 @@ def ParseArguments():
                        dest   = 'all_completers' )
 
   args = parser.parse_args()
+
+  if not args.arch:
+    if platform.architecture()[ 0 ] == '64bit':
+      args.arch = 64
+    else:
+      args.arch = 32
 
   if ( args.system_libclang and
        not args.clang_completer and
@@ -317,6 +323,25 @@ def ExitIfYcmdLibInUseOnWindows():
                 'Stop all ycmd instances before compilation.' )
 
 
+VC_VARS_SCRIPT = os.path.join('..', '..', 'VC', 'vcvarsall.bat')
+
+
+def GetVcVarsScriptDir( args ):
+  if args.msvc == 11:
+      return os.path.join( os.environ[ 'VS110COMNTOOLS' ], VC_VARS_SCRIPT )
+  if args.msvc == 12:
+      return os.path.join( os.environ[ 'VS120COMNTOOLS' ], VC_VARS_SCRIPT )
+  if args.msvc == 14:
+      return os.path.join( os.environ[ 'VS140COMNTOOLS' ], VC_VARS_SCRIPT )
+  raise RuntimeError( 'msvc parameter should be 11, 12, or 14.' )
+
+
+def GetVcMod( args ):
+  if args.arch == 64:
+    return 'x86_amd64'
+  return 'x86'
+
+
 def BuildYcmdLib( args ):
   build_dir = mkdtemp( prefix = 'ycm_build.' )
 
@@ -328,12 +353,14 @@ def BuildYcmdLib( args ):
     full_cmake_args.append( p.join( DIR_OF_THIS_SCRIPT, 'cpp' ) )
 
     os.chdir( build_dir )
-    subprocess.check_call( [ 'cmake' ] + full_cmake_args )
+    subprocess.check_call( [ GetVcVarsScriptDir( args ), GetVcMod( args ),
+                             '&', 'cmake' ] + full_cmake_args )
 
     build_target = ( 'ycm_core' if 'YCM_TESTRUN' not in os.environ else
                      'ycm_core_tests' )
 
-    build_command = [ 'cmake', '--build', '.', '--target', build_target ]
+    build_command = [ GetVcVarsScriptDir( args ), GetVcMod( args ),
+                      '&', 'cmake', '--build', '.', '--target', build_target ]
     if OnWindows():
       build_command.extend( [ '--config', 'Release' ] )
     else:

@@ -64,3 +64,10 @@ set PATH=C:\Program Files\Rust\bin;%PATH%
 
 rustc -Vv
 cargo -V
+
+::
+:: Ninja
+::
+appveyor DownloadFile https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip
+7z x ninja-win.zip -oC:\Ninja > nul
+set PATH=C:\Ninja;%PATH%
