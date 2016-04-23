@@ -15,6 +15,9 @@ compiler:
 script: ./run_tests.py
 after_success:
   - if [ x"${COVERAGE}" = x"true" ]; then coveralls; fi
+  - if [ x"${TRAVIS_OS_NAME}" = x"linux" ]; then ldd ycm_core.so; fi
+  - if [ x"${TRAVIS_OS_NAME}" = x"linux" ]; then objdump -x ycm_core.so | grep RPATH; fi
+  - if [ x"${TRAVIS_OS_NAME}" = x"osx" ]; then otool -L ycm_core.so; fi
 env:
   global:
     - MONO_THREADS_PER_CPU=2000
