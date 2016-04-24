@@ -23,7 +23,10 @@
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
+#pragma warning( push )
+#pragma warning( disable: 4244 )
 #include <boost/python.hpp>
+#pragma warning( pop )
 #include <clang-c/CXCompilationDatabase.h>
 
 

@@ -31,9 +31,16 @@
 #  include "Documentation.h"
 #endif // USE_CLANG_COMPLETER
 
+#pragma warning( push )
+#pragma warning( disable: 4244 )
 #include <boost/python.hpp>
+#pragma warning( pop )
 #include <boost/utility.hpp>
+// Ignore C4267 warning
+#pragma warning( push )
+#pragma warning( disable: 4267 )
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#pragma warning( pop )
 
 bool HasClangSupport() {
 #ifdef USE_CLANG_COMPLETER

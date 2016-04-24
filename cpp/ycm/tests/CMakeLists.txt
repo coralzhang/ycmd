@@ -25,6 +25,14 @@ if ( COMPILER_IS_CLANG )
     "${CMAKE_CXX_FLAGS} -Wno-long-long -Wno-variadic-macros -Wno-missing-field-initializers -Wno-unused-private-field -Wno-c++98-compat" )
 endif()
 
+if ( MSVC )
+  foreach (flag_var
+           CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+           CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+    # Ignore warnings.
+    string(REGEX REPLACE "/W[1-4]" "/W0" ${flag_var} "${${flag_var}}")
+  endforeach()
+endif()
 
 option( USE_SYSTEM_GMOCK "Set to ON to use the system gmock/gtest libraries" OFF )
 

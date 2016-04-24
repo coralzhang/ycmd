@@ -78,6 +78,15 @@ if( CMAKE_COMPILER_IS_GNUCXX OR COMPILER_IS_CLANG )
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 endif()
 
+if ( MSVC )
+  foreach (flag_var
+           CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+           CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+    # Ignore warnings.
+    string(REGEX REPLACE "/W[1-4]" "/W0" ${flag_var} "${${flag_var}}")
+  endforeach()
+endif()
+
 #############################################################################
 
 if( NOT WIN32 )

@@ -18,7 +18,10 @@
 #ifndef RELEASEGIL_H_RDIEBSQ1
 #define RELEASEGIL_H_RDIEBSQ1
 
+#pragma warning( push )
+#pragma warning( disable: 4244 )
 #include <boost/python.hpp>
+#pragma warning( pop )
 
 namespace YouCompleteMe {
 

@@ -18,7 +18,10 @@
 #ifndef PYTHONSUPPORT_H_KWGFEX0V
 #define PYTHONSUPPORT_H_KWGFEX0V
 
+#pragma warning( push )
+#pragma warning( disable: 4244 )
 #include <boost/python.hpp>
+#pragma warning( pop )
 
 namespace YouCompleteMe {
 

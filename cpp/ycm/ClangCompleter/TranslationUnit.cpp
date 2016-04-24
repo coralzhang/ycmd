@@ -96,9 +96,9 @@ TranslationUnit::TranslationUnit(
                          clang_index,
                          filename.c_str(),
                          &pointer_flags[ 0 ],
-                         pointer_flags.size(),
+                         (int) pointer_flags.size(),
                          const_cast<CXUnsavedFile *>( unsaved ),
-                         cxunsaved_files.size(),
+                         (uint) cxunsaved_files.size(),
                          EditingOptions(),
                          &clang_translation_unit_ );
 
@@ -174,7 +174,7 @@ std::vector< CompletionData > TranslationUnit::CandidatesForLocation(
                           line,
                           column,
                           const_cast<CXUnsavedFile *>( unsaved ),
-                          cxunsaved_files.size(),
+                          (uint) cxunsaved_files.size(),
                           CompletionOptions() ),
     clang_disposeCodeCompleteResults );
 
@@ -356,7 +356,7 @@ void TranslationUnit::Reparse( std::vector< CXUnsavedFile > &unsaved_files,
                              ? &unsaved_files[ 0 ] : NULL;
 
     failure = clang_reparseTranslationUnit( clang_translation_unit_,
-                                            unsaved_files.size(),
+                                            (uint) unsaved_files.size(),
                                             unsaved,
                                             parse_options );
   }

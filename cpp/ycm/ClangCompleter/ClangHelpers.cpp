@@ -133,7 +133,7 @@ Range GetLocationExtent( CXSourceLocation source_location,
       std::string name = CXStringToString(
                            clang_getTokenSpelling( translation_unit, tokens[ i ] ) );
       Location end_location = location;
-      end_location.column_number_ += name.length();
+      end_location.column_number_ += (uint) name.length();
       final_range = Range( location, end_location );
       break;
     }
@@ -168,7 +168,7 @@ std::vector< CompletionData > ToCompletionDataVector(
     return completions;
 
   completions.reserve( results->NumResults );
-  unordered_map< std::string, uint > seen_data;
+  unordered_map< std::string, size_t > seen_data;
 
   for ( uint i = 0; i < results->NumResults; ++i ) {
     CXCompletionResult completion_result = results->Results[ i ];
@@ -177,9 +177,9 @@ std::vector< CompletionData > ToCompletionDataVector(
       continue;
 
     CompletionData data( completion_result );
-    uint index = GetValueElseInsert( seen_data,
-                                     data.original_string_,
-                                     completions.size() );
+    size_t index = GetValueElseInsert( seen_data,
+                                       data.original_string_,
+                                       completions.size() );
 
     if ( index == completions.size() ) {
       completions.push_back( boost::move( data ) );
