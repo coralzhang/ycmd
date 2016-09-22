@@ -56,12 +56,10 @@ cargo -V
 :: PHP configuration
 ::
 
-cinst -y OpenSSL.Light
-set PATH=C:\Program Files\OpenSSL;%PATH%
 cinst -y php
 pushd C:\tools\php
 copy php.ini-production php.ini
-echo date.timezone="UTC" >> php.ini
+:: echo date.timezone="UTC" >> php.ini
 echo extension_dir=ext >> php.ini
 echo extension=php_openssl.dll >> php.ini
 popd

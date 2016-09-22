@@ -22,6 +22,8 @@ for pkg in $REQUIREMENTS; do
   brew install $pkg || brew outdated $pkg || brew upgrade $pkg
 done
 
+php --version
+
 # In order to work with ycmd, python *must* be built as a shared library. The
 # most compatible way to do this on OS X is with --enable-framework. This is
 # set via the PYTHON_CONFIGURE_OPTS option.

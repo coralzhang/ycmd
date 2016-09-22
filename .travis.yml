@@ -75,4 +75,4 @@ cache:
     - $TRAVIS_BUILD_DIR/clang_archives  # Clang downloads
     - $TRAVIS_BUILD_DIR/third_party/racerd/target  # Racerd compilation
     - $HOME/.composer/cache  # Composer
-    - $HOME/.phpenv/versions/$PHP_VERSION  # PHP env
+      #    - $HOME/.phpenv/versions/$PHP_VERSION  # PHP env

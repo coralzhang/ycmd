@@ -30,3 +30,4 @@ if [ ! -e "${HOME}/.phpenv/versions/${PHP_VERSION}/bin/php" ]; then
 fi
 
 export PATH=${HOME}/.phpenv/versions/${PHP_VERSION}/bin:${PATH}
+php --version
