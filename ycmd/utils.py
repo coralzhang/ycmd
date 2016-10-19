@@ -24,8 +24,9 @@ from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import *  # noqa
-from future.utils import PY2, native
+from future.utils import iteritems, PY2, native
 
+import collections
 import os
 import socket
 import subprocess
@@ -447,3 +448,14 @@ def GetCurrentDirectory():
   # OSError.
   except OSError:
     return tempfile.gettempdir()
+
+
+def UpdateDictionary( source, other ):
+  """Updates dictionary |source| with the key/value pairs from dictionary
+  |other| to any depth, overwriting existing keys."""
+  for key, value in iteritems( other ):
+    if isinstance( value, collections.Mapping ) and value:
+      source[ key ] = UpdateDictionary( source.get( key, {} ), value )
+    else:
+      source[ key ] = other[ key ]
+  return source

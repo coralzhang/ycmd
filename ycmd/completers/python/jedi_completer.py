@@ -29,6 +29,7 @@ standard_library.install_aliases()
 
 from ycmd.utils import ToBytes, ToUnicode, ProcessIsRunning
 from ycmd.completers.completer import Completer
+from ycmd.completers.python.settings import PythonSettings
 from ycmd import responses, utils, hmac_utils
 from tempfile import NamedTemporaryFile
 
@@ -70,6 +71,7 @@ class JediCompleter( Completer ):
     self._keep_logfiles = user_options[ 'server_keep_logfiles' ]
     self._hmac_secret = ''
     self._python_binary_path = sys.executable
+    self._python_settings = PythonSettings()
 
     self._UpdatePythonBinary( user_options.get( 'python_binary_path' ) )
     self._StartServer()
@@ -196,11 +198,10 @@ class JediCompleter( Completer ):
     return logging.getLevelName( log_level ).lower()
 
 
-  def _GetResponse( self, handler, request_data = {} ):
+  def _GetResponse( self, handler, parameters = {} ):
     """POST JSON data to JediHTTP server and return JSON response."""
     handler = ToBytes( handler )
     url = urllib.parse.urljoin( self._jedihttp_host, handler )
-    parameters = self._TranslateRequestForJediHTTP( request_data )
     body = ToBytes( json.dumps( parameters ) ) if parameters else bytes()
     extra_headers = self._ExtraHeaders( handler, body )
 
@@ -237,12 +238,14 @@ class JediCompleter( Completer ):
     # JediHTTP (as Jedi itself) expects columns to start at 0, not 1, and for
     # them to be unicode codepoint offsets.
     col = request_data[ 'start_codepoint' ] - 1
+    settings = self._SettingsForRequest( request_data )[ 'jedi' ][ 'settings' ]
 
     return {
       'source': source,
       'line': line,
       'col': col,
-      'source_path': path
+      'source_path': path,
+      'settings': settings
     }
 
 
@@ -273,8 +276,8 @@ class JediCompleter( Completer ):
 
 
   def _JediCompletions( self, request_data ):
-    return self._GetResponse( '/completions',
-                              request_data )[ 'completions' ]
+    request = self._TranslateRequestForJediHTTP( request_data )
+    return self._GetResponse( '/completions', request )[ 'completions' ]
 
 
   def GetSubcommandsMap( self ):
@@ -345,7 +348,8 @@ class JediCompleter( Completer ):
 
   def _GetDefinitionsList( self, handler, request_data ):
     try:
-      response = self._GetResponse( handler, request_data )
+      request = self._TranslateRequestForJediHTTP( request_data )
+      response = self._GetResponse( handler, request )
       return response[ 'definitions' ]
     except Exception as e:
       self._logger.exception( e )
@@ -386,6 +390,17 @@ class JediCompleter( Completer ):
     return responses.BuildDetailedInfoResponse( '\n---\n'.join( docs ) )
 
 
+  def OnFileReadyToParse( self, request_data ):
+    self._SettingsForRequest( request_data )
+
+
+  def _SettingsForRequest( self, request_data ):
+    filename = request_data[ 'filepath' ]
+    client_data = request_data.get( 'extra_conf_data' )
+    return self._python_settings.SettingsForFile( filename,
+                                                  client_data = client_data )
+
+
   def DebugInfo( self, request_data ):
     with self._server_lock:
       jedihttp_server = responses.DebugInfoServer(
@@ -400,7 +415,12 @@ class JediCompleter( Completer ):
         key = 'Python interpreter',
         value = self._python_binary_path )
 
+      filename = request_data[ 'filepath' ]
+      project_root_item = responses.DebugInfoItem(
+        key = 'Project root',
+        value = self._python_settings.GetProjectRootForFile( filename ) )
+
       return responses.BuildDebugInfoResponse(
         name = 'Python',
         servers = [ jedihttp_server ],
-        items = [ python_interpreter_item ] )
+        items = [ python_interpreter_item, project_root_item ] )

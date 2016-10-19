@@ -46,9 +46,15 @@ def DebugInfo_test( app ):
         'logfiles': contains( instance_of( str ),
                               instance_of( str ) )
       } ) ),
-      'items': contains( has_entries( {
-        'key': 'Python interpreter',
-        'value': instance_of( str )
-      } ) )
+      'items': contains(
+        has_entries( {
+          'key': 'Python interpreter',
+          'value': instance_of( str )
+        } ),
+        has_entries( {
+          'key': 'Project root',
+          'value': None
+        } )
+      )
     } ) )
   )
