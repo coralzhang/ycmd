@@ -100,7 +100,7 @@ class ClangCompleter( Completer ):
 
     files = self.GetUnsavedFilesVector( request_data )
     line = request_data[ 'line_num' ]
-    column = request_data[ 'start_column' ]
+    column = self.StartColumn( request_data )
     with self._files_being_compiled.GetExclusive( filename ):
       results = self._completer.CandidatesForLocationInFile(
           ToCppStringCompatible( filename ),

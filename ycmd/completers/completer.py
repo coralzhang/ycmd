@@ -1,3 +1,5 @@
+# encoding: utf8
+#
 # Copyright (C) 2011, 2012, 2013 Google Inc.
 #
 # This file is part of ycmd.
@@ -25,9 +27,12 @@ from builtins import *  # noqa
 
 import abc
 import threading
-from ycmd.utils import ForceSemanticCompletion
 from ycmd.completers import completer_utils
+from ycmd.identifier_utils import StartOfLongestIdentifierEndingAtIndex
 from ycmd.responses import NoDiagnosticSupport
+from ycmd.utils import ( ByteOffsetToCodepointOffset,
+                         CodepointOffsetToByteOffset,
+                         ForceSemanticCompletion )
 from future.utils import with_metaclass
 
 NO_USER_COMMANDS = 'This completer does not define any commands.'
@@ -165,6 +170,53 @@ class Completer( with_metaclass( abc.ABCMeta, object ) ):
     return 0
 
 
+  def StartColumn( self, request_data ):
+    """Returns the 1-based byte index where the completion query should start.
+    So if the user enters:
+      foo.bar^
+    with the cursor being at the location of the caret (so the character *AFTER*
+    'r'), then the starting column would be the index of the letter 'b'.
+
+    NOTE: if the line contains multi-byte characters, then the result is not
+    the 'character' index (see CompletionStartCodepoint for that), and therefore
+    it is not safe to perform any character-relevant arithmetic on the result
+    of this method."""
+    return CodepointOffsetToByteOffset( request_data[ 'line_value' ],
+                                        self.StartCodepoint( request_data ) )
+
+
+  def StartCodepoint( self, request_data ):
+    """Returns the 1-based codepoint index where the completion query should
+    start.  So if the user enters:
+      ƒøø.∫å®^
+    with the cursor being at the location of the caret (so the character *AFTER*
+    '®'), then the starting column would be the index of the character '∫'
+    (i.e. 5, not its byte index)."""
+    line_value = request_data[ 'line_value' ]
+    column_num = request_data[ 'column_num' ]
+    codepoint_column_num = ByteOffsetToCodepointOffset( line_value, column_num )
+
+    # -1 and then +1 to account for difference betwen 0-based and 1-based
+    # indices/columns
+    return self.StartCodepointInner( line_value,
+                                     codepoint_column_num - 1,
+                                     request_data[ 'first_filetype' ] ) + 1
+
+
+  def StartCodepointInner( self, line_value, column_num, filetype ):
+    """|line_value|: unicode string
+       |column_num|: byte offset column"""
+    return StartOfLongestIdentifierEndingAtIndex( line_value,
+                                                  column_num,
+                                                  filetype )
+
+
+  def Query( self, request_data ):
+    start_codepoint = self.StartCodepoint( request_data ) - 1
+    column_codepoint = request_data[ 'column_codepoint' ] - 1
+    return request_data[ 'line_value' ][ start_codepoint : column_codepoint ]
+
+
   # It's highly likely you DON'T want to override this function but the *Inner
   # version of it.
   def ShouldUseNow( self, request_data ):
@@ -177,7 +229,7 @@ class Completer( with_metaclass( abc.ABCMeta, object ) ):
     # data.
     cache_completions = self._completions_cache.GetCompletionsIfCacheValid(
         request_data[ 'line_num' ],
-        request_data[ 'start_column' ],
+        self.StartColumn( request_data ),
         self.CompletionType( request_data ) )
 
     # If None, then the cache isn't valid and we know we should return true
@@ -192,7 +244,7 @@ class Completer( with_metaclass( abc.ABCMeta, object ) ):
     if not self.prepared_triggers:
       return False
     current_line = request_data[ 'line_value' ]
-    start_codepoint = request_data[ 'start_codepoint' ] - 1
+    start_codepoint = self.StartCodepoint( request_data ) - 1
     column_codepoint = request_data[ 'column_codepoint' ] - 1
     filetype = self._CurrentFiletype( request_data[ 'filetypes' ] )
 
@@ -203,7 +255,7 @@ class Completer( with_metaclass( abc.ABCMeta, object ) ):
   def QueryLengthAboveMinThreshold( self, request_data ):
     # Note: calculation in 'characters' not bytes.
     query_length = ( request_data[ 'column_codepoint' ] -
-                     request_data[ 'start_codepoint' ] )
+                     self.StartCodepoint( request_data ) )
 
     return query_length >= self.min_num_chars
 
@@ -216,16 +268,16 @@ class Completer( with_metaclass( abc.ABCMeta, object ) ):
       return []
 
     candidates = self._GetCandidatesFromSubclass( request_data )
-    if request_data[ 'query' ]:
-      candidates = self.FilterAndSortCandidates( candidates,
-                                                 request_data[ 'query' ] )
+    query = self.Query( request_data )
+    if query:
+      candidates = self.FilterAndSortCandidates( candidates, query )
     return candidates
 
 
   def _GetCandidatesFromSubclass( self, request_data ):
     cache_completions = self._completions_cache.GetCompletionsIfCacheValid(
           request_data[ 'line_num' ],
-          request_data[ 'start_column' ],
+          self.StartColumn( request_data ),
           self.CompletionType( request_data ) )
 
     if cache_completions:
@@ -234,7 +286,7 @@ class Completer( with_metaclass( abc.ABCMeta, object ) ):
       raw_completions = self.ComputeCandidatesInner( request_data )
       self._completions_cache.Update(
           request_data[ 'line_num' ],
-          request_data[ 'start_column' ],
+          self.StartColumn( request_data ),
           self.CompletionType( request_data ),
           raw_completions )
       return raw_completions

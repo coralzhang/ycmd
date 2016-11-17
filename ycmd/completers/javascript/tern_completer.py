@@ -199,7 +199,7 @@ class TernCompleter( Completer ):
     }
 
     completions = self._GetResponse( query,
-                                     request_data[ 'start_codepoint' ],
+                                     self.StartCodepoint( request_data ),
                                      request_data ).get( 'completions', [] )
 
     def BuildDoc( completion ):

@@ -79,7 +79,7 @@ class FilenameCompleter( Completer ):
 
 
   def ShouldCompleteIncludeStatement( self, request_data ):
-    start_codepoint = request_data[ 'start_codepoint' ] - 1
+    start_codepoint = self.StartCodepoint( request_data ) - 1
     current_line = request_data[ 'line_value' ]
     filepath = request_data[ 'filepath' ]
     filetypes = request_data[ 'file_data' ][ filepath ][ 'filetypes' ]
@@ -89,7 +89,7 @@ class FilenameCompleter( Completer ):
 
   def ShouldUseNowInner( self, request_data ):
     current_line = request_data[ 'line_value' ]
-    start_codepoint = request_data[ 'start_codepoint' ]
+    start_codepoint = self.StartCodepoint( request_data )
 
     # inspect the previous 'character' from the start column to find the trigger
     # note: 1-based still. we subtract 1 when indexing into current_line
@@ -107,7 +107,7 @@ class FilenameCompleter( Completer ):
 
   def ComputeCandidatesInner( self, request_data ):
     current_line = request_data[ 'line_value' ]
-    start_codepoint = request_data[ 'start_codepoint' ] - 1
+    start_codepoint = self.StartCodepoint( request_data ) - 1
     filepath = request_data[ 'filepath' ]
     filetypes = request_data[ 'file_data' ][ filepath ][ 'filetypes' ]
     line = current_line[ : start_codepoint ]

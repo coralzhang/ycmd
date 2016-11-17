@@ -137,7 +137,7 @@ class GoCompleter( Completer ):
     # with contents (a bytes instance) above is correct.
     offset = _ComputeOffset( contents,
                              request_data[ 'line_num' ],
-                             request_data[ 'start_column' ] )
+                             self.StartColumn( request_data ) )
 
     stdoutdata = self._ExecuteCommand( [ self._gocode_binary_path,
                                          '-sock', 'tcp',

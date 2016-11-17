@@ -53,7 +53,7 @@ class IdentifierCompleter( GeneralCompleter ):
       return []
 
     completions = self._completer.CandidatesForQueryAndType(
-      ToCppStringCompatible( _SanitizeQuery( request_data[ 'query' ] ) ),
+      ToCppStringCompatible( _SanitizeQuery( self.Query( request_data ) ) ),
       ToCppStringCompatible( request_data[ 'first_filetype' ] ) )
 
     completions = completions[ : self._max_candidates ]

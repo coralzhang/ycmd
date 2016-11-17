@@ -322,7 +322,7 @@ class TypeScriptCompleter( Completer ):
     entries = self._SendRequest( 'completions', {
       'file':   request_data[ 'filepath' ],
       'line':   request_data[ 'line_num' ],
-      'offset': request_data[ 'start_codepoint' ]
+      'offset': self.StartCodepoint( request_data )
     } )
 
     # A less detailed version of the completion data is returned
@@ -340,7 +340,7 @@ class TypeScriptCompleter( Completer ):
     detailed_entries = self._SendRequest( 'completionEntryDetails', {
       'file':       request_data[ 'filepath' ],
       'line':       request_data[ 'line_num' ],
-      'offset':     request_data[ 'start_codepoint' ],
+      'offset':     self.StartCodepoint( request_data ),
       'entryNames': names
     } )
     return [ _ConvertDetailedCompletionData( e, namelength )

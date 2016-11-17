@@ -47,7 +47,7 @@ class UltiSnipsCompleter( GeneralCompleter ):
     if not self.ShouldUseNow( request_data ):
       return []
     return self.FilterAndSortCandidates(
-      self._candidates, request_data[ 'query' ] )
+      self._candidates, self.Query( request_data ) )
 
 
   def OnBufferVisit( self, request_data ):

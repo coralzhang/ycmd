@@ -1,5 +1,3 @@
-# encoding: utf8
-#
 # Copyright (C) 2014 Google Inc.
 #
 # This file is part of ycmd.
@@ -26,11 +24,8 @@ standard_library.install_aliases()
 from builtins import *  # noqa
 
 from ycmd.utils import ( ByteOffsetToCodepointOffset,
-                         CodepointOffsetToByteOffset,
-                         ToUnicode,
                          ToBytes,
                          SplitLines )
-from ycmd.identifier_utils import StartOfLongestIdentifierEndingAtIndex
 from ycmd.request_validation import EnsureRequestValid
 
 
@@ -45,10 +40,6 @@ class RequestWrap( object ):
       # Unicode string representation of the current line
       'line_value': self._CurrentLine,
 
-      # The calculated start column, as a codepoint offset into the
-      # unicode string line_value
-      'start_codepoint': self.CompletionStartCodepoint,
-
       # The 'column_num' as a unicode codepoint offset
       'column_codepoint': (lambda:
         ByteOffsetToCodepointOffset( self[ 'line_bytes' ],
@@ -57,16 +48,8 @@ class RequestWrap( object ):
       # Bytes string representation of the current line
       'line_bytes': lambda: ToBytes( self[ 'line_value' ] ),
 
-      # The calculated start column, as a byte offset into the UTF-8 encoded
-      # bytes returned by line_bytes
-      'start_column': self.CompletionStartColumn,
-
       # Note: column_num is the byte offset into the UTF-8 encoded bytes
       # returned by line_bytes
-
-      # unicode string representation of the 'query' after the beginning
-      # of the identifier to be completed
-      'query': self._Query,
 
       'filetypes': self._Filetypes,
 
@@ -103,24 +86,6 @@ class RequestWrap( object ):
     return SplitLines( contents )[ self._request[ 'line_num' ] - 1 ]
 
 
-  def CompletionStartColumn( self ):
-    return CompletionStartColumn( self[ 'line_value' ],
-                                  self[ 'column_num' ],
-                                  self[ 'first_filetype' ] )
-
-
-  def CompletionStartCodepoint( self ):
-    return CompletionStartCodepoint( self[ 'line_value' ],
-                                     self[ 'column_num' ],
-                                     self[ 'first_filetype' ] )
-
-
-  def _Query( self ):
-    return self[ 'line_value' ][
-        self[ 'start_codepoint' ] - 1 : self[ 'column_codepoint' ] - 1
-    ]
-
-
   def _FirstFiletype( self ):
     try:
       return self[ 'filetypes' ][ 0 ]
@@ -131,40 +96,3 @@ class RequestWrap( object ):
   def _Filetypes( self ):
     path = self[ 'filepath' ]
     return self[ 'file_data' ][ path ][ 'filetypes' ]
-
-
-def CompletionStartColumn( line_value, column_num, filetype ):
-  """Returns the 1-based byte index where the completion query should start.
-  So if the user enters:
-    foo.bar^
-  with the cursor being at the location of the caret (so the character *AFTER*
-  'r'), then the starting column would be the index of the letter 'b'.
-
-  NOTE: if the line contains multi-byte characters, then the result is not
-  the 'character' index (see CompletionStartCodepoint for that), and therefore
-  it is not safe to perform any character-relevant arithmetic on the result
-  of this method."""
-  return CodepointOffsetToByteOffset(
-      ToUnicode( line_value ),
-      CompletionStartCodepoint( line_value, column_num, filetype ) )
-
-
-def CompletionStartCodepoint( line_value, column_num, filetype ):
-  """Returns the 1-based codepoint index where the completion query should
-  start.  So if the user enters:
-    ƒøø.∫å®^
-  with the cursor being at the location of the caret (so the character *AFTER*
-  '®'), then the starting column would be the index of the character '∫'
-  (i.e. 5, not its byte index)."""
-
-  # NOTE: column_num and other numbers on the wire are byte indices, but we need
-  # to walk codepoints for identifier checks.
-  codepoint_column_num = ByteOffsetToCodepointOffset( line_value, column_num )
-
-  unicode_line_value = ToUnicode( line_value )
-  # -1 and then +1 to account for difference betwen 0-based and 1-based
-  # indices/columns
-  codepoint_start_column = StartOfLongestIdentifierEndingAtIndex(
-      unicode_line_value, codepoint_column_num - 1, filetype ) + 1
-
-  return codepoint_start_column

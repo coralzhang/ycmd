@@ -235,7 +235,7 @@ class JediCompleter( Completer ):
     line = request_data[ 'line_num' ]
     # JediHTTP (as Jedi itself) expects columns to start at 0, not 1, and for
     # them to be unicode codepoint offsets.
-    col = request_data[ 'start_codepoint' ] - 1
+    col = self.StartCodepoint( request_data ) - 1
 
     return {
       'source': source,
