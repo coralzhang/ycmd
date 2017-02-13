@@ -28,38 +28,6 @@ project( BoostParts )
 
 file( GLOB_RECURSE SOURCES *.cpp )
 
-# We need to remove all the thread cpp files and then add them on a per-platform
-# basis
-file( GLOB_RECURSE to_remove libs/thread/*.cpp libs/detail/*.cpp )
-
-if( to_remove )
-  list( REMOVE_ITEM SOURCES ${to_remove} )
-endif()
-
-set( COMMON_SOURCES
-    libs/thread/src/future.cpp
-    )
-
-set( WIN_SOURCES
-    libs/thread/src/win32/thread.cpp
-    libs/thread/src/win32/tss_dll.cpp
-    libs/thread/src/win32/tss_pe.cpp
-    )
-
-set( UNIX_SOURCES
-    libs/thread/src/pthread/once.cpp
-    libs/thread/src/pthread/once_atomic.cpp
-    libs/thread/src/pthread/thread.cpp
-    )
-
-list( APPEND SOURCES ${COMMON_SOURCES} )
-
-if ( WIN32 )
-    list( APPEND SOURCES ${WIN_SOURCES} )
-else()
-    list( APPEND SOURCES ${UNIX_SOURCES} )
-endif()
-
 #############################################################################
 
 include_directories(
@@ -93,9 +61,4 @@ endif()
 if( MSVC )
   set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Oi /GL" )
   set_target_properties( ${PROJECT_NAME} PROPERTIES STATIC_LIBRARY_FLAGS "/LTCG" )
-endif()
-
-if( SYSTEM_IS_SUNOS )
-  # SunOS needs this setting for thread support
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthreads" )
 endif()

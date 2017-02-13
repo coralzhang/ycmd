@@ -34,30 +34,11 @@ BOOST_URL = ( 'https://sourceforge.net/projects/boost/files/boost/'
 BOOST_NAME = 'boost_{version_}'
 BOOST_ARCHIVE = BOOST_NAME + '.tar.bz2'
 BOOST_PARTS = [
-  'boost/utility.hpp',
-  'boost/python.hpp',
-  'boost/bind.hpp',
-  'boost/lambda/lambda.hpp',
-  'boost/exception/all.hpp',
-  'boost/tuple/tuple_io.hpp',
-  'boost/tuple/tuple_comparison.hpp',
-  'boost/regex.hpp',
-  'boost/foreach.hpp',
-  'boost/smart_ptr.hpp',
-  'boost/algorithm/string_regex.hpp',
-  'boost/thread.hpp',
-  'boost/unordered_map.hpp',
-  'boost/unordered_set.hpp',
-  'boost/format.hpp',
-  'boost/ptr_container/ptr_container.hpp',
+  'boost/algorithm/string/regex.hpp',
+  'boost/array.hpp',
   'boost/filesystem.hpp',
-  'boost/filesystem/fstream.hpp',
-  'boost/utility.hpp',
-  'boost/algorithm/cxx11/any_of.hpp',
-  'atomic',
-  'lockfree',
-  'assign',
-  'system'
+  'boost/functional/hash.hpp',
+  'boost/python.hpp'
 ]
 BOOST_LIBS_FOLDERS_TO_REMOVE = [
   'assign',
