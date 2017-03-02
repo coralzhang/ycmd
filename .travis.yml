@@ -1,7 +1,7 @@
 language: generic
 os:
   - linux
-  - osx
+  # - osx
 dist: trusty
 osx_image: xcode8
 sudo: false
@@ -12,7 +12,9 @@ install:
   - source ci/travis/travis_install.sh
 compiler:
   - gcc
-script: ./run_tests.py
+script:
+  - go version
+  - ./run_tests.py --runs 30 ycmd/tests/go/debug_info_test.py
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 env:
@@ -21,10 +23,16 @@ env:
     - YCM_CORES=3
     - COVERAGE=true
   matrix:
-    - USE_CLANG_COMPLETER=false YCMD_PYTHON_VERSION=2.6
-    - USE_CLANG_COMPLETER=true YCMD_PYTHON_VERSION=2.6
-    - USE_CLANG_COMPLETER=true YCMD_PYTHON_VERSION=2.7
-    - USE_CLANG_COMPLETER=true YCMD_PYTHON_VERSION=3.3
+    - YCMD_TEST=1 YCMD_PYTHON_VERSION=3.3
+    - YCMD_TEST=2 YCMD_PYTHON_VERSION=3.3
+    - YCMD_TEST=3 YCMD_PYTHON_VERSION=3.3
+    - YCMD_TEST=4 YCMD_PYTHON_VERSION=3.3
+    - YCMD_TEST=5 YCMD_PYTHON_VERSION=3.3
+    - YCMD_TEST=6 YCMD_PYTHON_VERSION=3.3
+    - YCMD_TEST=7 YCMD_PYTHON_VERSION=3.3
+    - YCMD_TEST=8 YCMD_PYTHON_VERSION=3.3
+    - YCMD_TEST=9 YCMD_PYTHON_VERSION=3.3
+    - YCMD_TEST=10 YCMD_PYTHON_VERSION=3.3
 matrix:
   exclude:
     - os: osx
