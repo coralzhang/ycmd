@@ -126,6 +126,9 @@ class Completer( with_metaclass( abc.ABCMeta, object ) ):
   return a list of strings, where the strings are Vim filetypes your completer
   supports.
 
+  If your completer supports diagnostics, the DiagnosticsAvailable() function
+  should return True.
+
   clang_completer.py is a good example of a "complicated" completer. A good
   example of a simple completer is ultisnips_completer.py.
 
@@ -340,10 +343,6 @@ class Completer( with_metaclass( abc.ABCMeta, object ) ):
     pass # pragma: no cover
 
 
-  def GetDiagnosticsForCurrentFile( self, request_data ):
-    raise NoDiagnosticSupport
-
-
   def GetDetailedDiagnostic( self, request_data ):
     raise NoDiagnosticSupport
 
@@ -361,6 +360,10 @@ class Completer( with_metaclass( abc.ABCMeta, object ) ):
   @abc.abstractmethod
   def SupportedFiletypes( self ):
     return set()
+
+
+  def DiagnosticsAvailable( self ):
+    return False
 
 
   def DebugInfo( self, request_data ):
