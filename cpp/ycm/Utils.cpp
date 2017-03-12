@@ -32,15 +32,19 @@ bool AlmostEqual( double a, double b ) {
 }
 
 
-std::string ReadUtf8File( const fs::path &filepath ) {
+std::vector< std::string > ReadUtf8File( const fs::path &filepath ) {
   fs::ifstream file( filepath, std::ios::in | std::ios::binary );
-  std::vector< char > contents( ( std::istreambuf_iterator< char >( file ) ),
-                                std::istreambuf_iterator< char >() );
+  std::string line;
+  std::vector< std::string > contents;
+  while( getline( file, line ) )
+  {
+	  contents.push_back(line);
+  }
 
   if ( contents.size() == 0 )
-    return std::string();
+    return std::vector< std::string >();
 
-  return std::string( contents.begin(), contents.end() );
+  return contents;
 }
 
 
