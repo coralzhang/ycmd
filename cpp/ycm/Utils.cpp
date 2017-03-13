@@ -40,9 +40,6 @@ std::vector< std::string > ReadUtf8File( const fs::path &filepath ) {
     contents.push_back( line );
   }
 
-  if ( contents.size() == 0 )
-    return std::vector< std::string >();
-
   return contents;
 }
 
