@@ -32,7 +32,7 @@ from ycmd.tests.test_utils import BuildRequest
 from ycmd.utils import ReadFile
 
 
-@IsolatedYcmd
+@IsolatedYcmd()
 def Diagnostics_ZeroBasedLineAndColumn_test( app ):
   contents = """
 void foo() {
@@ -80,7 +80,7 @@ void foo() {
                   } ) ) )
 
 
-@IsolatedYcmd
+@IsolatedYcmd()
 def Diagnostics_SimpleLocationExtent_test( app ):
   contents = """
 void foo() {
@@ -112,7 +112,7 @@ void foo() {
                   } ) ) )
 
 
-@IsolatedYcmd
+@IsolatedYcmd()
 def Diagnostics_PragmaOnceWarningIgnored_test( app ):
   contents = """
 #pragma once
@@ -135,7 +135,7 @@ struct Foo {
   assert_that( response, empty() )
 
 
-@IsolatedYcmd
+@IsolatedYcmd()
 def Diagnostics_Works_test( app ):
   contents = """
 struct Foo {
@@ -162,7 +162,7 @@ struct Foo {
                has_entry( 'message', contains_string( "expected ';'" ) ) )
 
 
-@IsolatedYcmd
+@IsolatedYcmd()
 def Diagnostics_Multiline_test( app ):
   contents = """
 struct Foo {
@@ -190,7 +190,7 @@ int main() {
                has_entry( 'message', contains_string( "\n" ) ) )
 
 
-@IsolatedYcmd
+@IsolatedYcmd()
 def Diagnostics_FixIt_Available_test( app ):
   contents = ReadFile( PathToTestFile( 'FixIt_Clang_cpp11.cpp' ) )
 
@@ -223,7 +223,7 @@ def Diagnostics_FixIt_Available_test( app ):
   ) )
 
 
-@IsolatedYcmd
+@IsolatedYcmd()
 def Diagnostics_MultipleMissingIncludes_test( app ):
   contents = ReadFile( PathToTestFile( 'multiple_missing_includes.cc' ) )
 
